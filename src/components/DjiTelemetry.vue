@@ -6,31 +6,15 @@ const telemetry = ref(null);
 const errorMessage = ref("");
 
 onMounted(() => {
-  if (window.djiBridge) {
-    console.log("✅ DJI Bridge disponible");
-
-    // Obtener datos de telemetría del dron
-    window.djiBridge.aircraft.getFlightStatus()
-      .then(data => {
-        telemetry.value = data;
-        console.log("📡 Telemetría recibida:", data);
-
-        // Enviar datos al backend
-        axios.post("/api/telemetry", data)
-          .then(response => console.log("✅ Datos enviados:", response.data))
-          .catch(error => {
-            console.error("❌ Error enviando datos:", error);
-            errorMessage.value = "Error enviando datos al backend";
-          });
-      })
-      .catch(error => {
-        console.error("❌ Error obteniendo telemetría:", error);
-        errorMessage.value = "No se pudo obtener telemetría";
-      });
-  } else {
-    console.log("❌ DJI Bridge no disponible");
-    errorMessage.value = "DJI Bridge no está disponible";
-  }
+  axios.get("https://backend-dji.onrender.com/api/telemetry") // Llamada al backend
+    .then(response => {
+      telemetry.value = response.data;
+      console.log("📡 Telemetría recibida:", response.data);
+    })
+    .catch(error => {
+      console.error("❌ Error obteniendo datos de telemetría:", error);
+      errorMessage.value = "No se pudo obtener telemetría";
+    });
 });
 </script>
 
@@ -51,4 +35,3 @@ onMounted(() => {
     </q-card>
   </q-page>
 </template>
-
