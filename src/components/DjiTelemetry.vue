@@ -1,20 +1,32 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, onUnmounted } from "vue";
 import axios from "axios";
 
 const telemetry = ref(null);
 const errorMessage = ref("");
+let intervalId = null;
+
+const fetchTelemetry = async () => {
+  try {
+    const response = await axios.get("https://backend-dji.onrender.com/api/dji/historico");
+    console.log("📡 Datos en vivo recibidos:", response.data);
+    telemetry.value = response.data;
+  } catch (error) {
+    console.error("❌ Error obteniendo datos:", error);
+    errorMessage.value = "Error obteniendo datos del backend";
+  }
+};
 
 onMounted(() => {
-  axios.get("https://backend-dji.onrender.com/api/dji/historico")
-    .then(response => {
-      console.log("✅ Datos recibidos:", response.data);
-      telemetry.value = response.data;
-    })
-    .catch(error => {
-      console.error("❌ Error obteniendo datos:", error);
-      errorMessage.value = "Error obteniendo datos del backend";
-    });
+  fetchTelemetry(); // Cargar datos al inicio
+
+  // Configurar polling cada 3 segundos
+  intervalId = setInterval(fetchTelemetry, 3000);
+});
+
+onUnmounted(() => {
+  // Limpiar el intervalo cuando el componente se desmonta
+  clearInterval(intervalId);
 });
 </script>
 
@@ -27,12 +39,11 @@ onMounted(() => {
           ⚠ {{ errorMessage }}
         </q-banner>
         <q-list v-if="telemetry">
-          <q-item>
-            <q-item-section>🚀 Respuesta: {{ telemetry }}</q-item-section>
+          <q-item v-for="(item, index) in telemetry" :key="index">
+            <q-item-section>🚀 Datos: {{ item }}</q-item-section>
           </q-item>
         </q-list>
       </q-card-section>
     </q-card>
   </q-page>
 </template>
-
