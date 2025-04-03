@@ -3,7 +3,6 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import { Quasar, Notify } from "quasar";
 import router from "./routes/routes.js";
-import "quasar/src/css/index.sass";
 import axios from "axios";
 
 axios.defaults.baseURL = "https://backend-dji.onrender.com";
