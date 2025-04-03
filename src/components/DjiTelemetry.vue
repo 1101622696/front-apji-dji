@@ -6,19 +6,14 @@ const telemetry = ref(null);
 const errorMessage = ref("");
 
 onMounted(() => {
-  const datos = {
-    message: "Prueba de telemetría",
-    timestamp: new Date().toISOString(),
-  };
-
-  axios.post("https://backend-dji.onrender.com/api/dji/telemetry/webhook", datos)
+  axios.get("https://backend-dji.onrender.com/api/dji/historico")
     .then(response => {
-      console.log("✅ Datos enviados:", response.data);
-      telemetry.value = response.data; // Guarda los datos si es necesario
+      console.log("✅ Datos recibidos:", response.data);
+      telemetry.value = response.data;
     })
     .catch(error => {
-      console.error("❌ Error enviando datos:", error);
-      errorMessage.value = "Error enviando datos al backend";
+      console.error("❌ Error obteniendo datos:", error);
+      errorMessage.value = "Error obteniendo datos del backend";
     });
 });
 </script>
