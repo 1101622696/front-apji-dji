@@ -6,14 +6,19 @@ const telemetry = ref(null);
 const errorMessage = ref("");
 
 onMounted(() => {
-  axios.get("https://backend-dji.onrender.com/api/telemetry") // Llamada al backend
+  const datos = {
+    message: "Prueba de telemetría",
+    timestamp: new Date().toISOString(),
+  };
+
+  axios.post("https://backend-dji.onrender.com/api/dji/telemetry/webhook", datos)
     .then(response => {
-      telemetry.value = response.data;
-      console.log("📡 Telemetría recibida:", response.data);
+      console.log("✅ Datos enviados:", response.data);
+      telemetry.value = response.data; // Guarda los datos si es necesario
     })
     .catch(error => {
-      console.error("❌ Error obteniendo datos de telemetría:", error);
-      errorMessage.value = "No se pudo obtener telemetría";
+      console.error("❌ Error enviando datos:", error);
+      errorMessage.value = "Error enviando datos al backend";
     });
 });
 </script>
@@ -28,10 +33,11 @@ onMounted(() => {
         </q-banner>
         <q-list v-if="telemetry">
           <q-item>
-            <q-item-section>🚀 Estado: {{ telemetry }}</q-item-section>
+            <q-item-section>🚀 Respuesta: {{ telemetry }}</q-item-section>
           </q-item>
         </q-list>
       </q-card-section>
     </q-card>
   </q-page>
 </template>
+
